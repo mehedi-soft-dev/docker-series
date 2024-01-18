@@ -1,0 +1,41 @@
+version: "3.0"
+
+services:
+    db:
+        image: mysql:8.0.3
+        command: --default-authentication-plugin=mysql_native_password
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: "123456"
+            MYSQL_USER: "dbuser"
+            MYSQL_PASSWORD: "123456"
+            MYSQL_TCP_PORT: "3315"
+            
+        ports:
+            - "3315:3315"
+        
+        expose:
+            - 3315
+            
+        networks: 
+            - app-network
+            
+        volumes:
+            - ./dbdata:/var/lib/mysql
+            - ./_MySQL_INITScript:/docker-entrypoint-initdb.db
+        
+    accountownerapp:
+        depends_on:
+            - db
+        image: codemazeblog/accountowner:runtime
+        build:
+            context: .
+        ports:
+            - "8080:5000"
+            
+volumes:
+    dbdata:
+    
+networks:
+    app-network: 
+        driver: bridge
